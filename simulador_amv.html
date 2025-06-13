@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMULADOR AMV - OFICINA VALLEDUPAR (ANGELA MEDINA)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 10px; }
+    h1 { font-size: 1.4em; text-align: center; margin-bottom: 20px; }
+    .modulo { margin-bottom: 25px; }
+    .modulo h2 { font-size: 1.2em; margin-bottom: 10px; border-bottom: 1px solid #ccc; }
+    .pregunta { margin: 10px 0; }
+    .pregunta p { margin-bottom: 5px; }
+    label { display: block; padding: 4px 0; }
+    input[type="radio"] { margin-right: 8px; }
+    button {
+      width: 100%; padding: 12px;
+      font-size: 1em; background: #007AFF;
+      color: white; border: none; border-radius: 8px;
+      margin-top: 20px;
+    }
+    #resultado { text-align: center; margin-top: 15px; font-size: 1.1em; }
+  </style>
+</head>
+<body>
+  <h1>SIMULADOR AMV - OFICINA VALLEDUPAR (ANGELA MEDINA)</h1>
+  <div id="quizContainer"></div>
+  <button id="calcularBtn">Calcular resultado</button>
+  <div id="resultado"></div>
+
+  <script>
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+    const banco = {
+      Regulación: [
+        { texto: "¿Quién regula el mercado de valores en Colombia?", opciones: ["Superfinanciera","AMV","BVC","Ministerio"], correcta: 0 },
+        { texto: "¿Qué función cumplía históricamente la BVC?", opciones: ["Autorregulación","Transacciones bursátiles","Supervisión","Política monetaria"], correcta: 1 },
+        { texto: "La logística de negociación de acciones la administra:", opciones: ["AMV","BVC","Ministerio","Superfinanciera"], correcta: 1 },
+        { texto: "Entidad encargada de prohibir el uso de información privilegiada:", opciones: ["AMV","Superfinanciera","BVC","Fiscalía"], correcta: 1 },
+        { texto: "La normativa del mercado de valores aplica a:", opciones: ["Solo emisores","Brokers","Todos participantes","Solo inversionistas"], correcta: 2 },
+        { texto: "¿Quién supervisa las CIF?", opciones: ["AMV","Superfinanciera","BVC","Ministerio"], correcta: 1 },
+        { texto: "¿Quién fiscaliza los entes financieros?", opciones: ["AMV","Superfinanciera","BVC","DIAN"], correcta: 1 },
+        { texto: "La normativa de valores en Colombia es responsabilidad de:", opciones: ["AMV","Superfinanciera","BVC","Ministerio"], correcta: 1 },
+        { texto: "¿Quién establece reglas y sanciones en el mercado financiero?", opciones: ["Superfinanciera","AMV","BVC","Fiscalía"], correcta: 0 },
+        { texto: "La AMV actúa como:", opciones: ["Autorregulador","Supervisor","Bolsa","Ministerio"], correcta: 0 }
+      ],
+      Autorregulación: [
+        { texto: "¿Qué significa SIAMV?", opciones: ["Sistema Integral Autorregulación","Sistema Interministerial","Servicio Autorregulatorio","Sociedad de Inversionistas"], correcta: 0 },
+        { texto: "SIAMV desarrolla reglas para:", opciones: ["CIF","Ministerio","Gobierno","Inversionistas"], correcta: 0 },
+        { texto: "¿Quién cumple con el SIAMV?", opciones: ["Solo AMV","CIF y bolsas","Ministerio","Inversionistas"], correcta: 1 },
+        { texto: "La autorregulación es parte de:", opciones: ["AMV","Gobierno","BVC","Ministerio"], correcta: 0 },
+        { texto: "El propósito de SIAMV es:", opciones: ["Prevenir abusos","Generar utilidades","Regular impuestos","Política fiscal"], correcta: 0 },
+        { texto: "La autorregulación fortalece:", opciones: ["Confianza","Rentabilidad","Exportaciones","Fiscalización"], correcta: 0 },
+        { texto: "¿Quién imparte sanciones internas a CIF?", opciones: ["AMV","Superfinanciera","BVC","Ministerio"], correcta: 0 },
+        { texto: "Las reglas internas son propuestas por:", opciones: ["AMV","Superfinanciera","Ministerio","GDP"], correcta: 0 },
+        { texto: "SIAMV vigila:", opciones: ["Prácticas de mercado","Precios internacionales","Exportaciones","Política monetaria"], correcta: 0 },
+        { texto: "La participación de bolsas es:", opciones: ["Obligatoria","Voluntaria","Extra legal","Internacional"], correcta: 0 }
+      ],
+      "Ética e Integridad": [
+        { texto: "¿Un asesor prioriza al cliente antes que a sí mismo?", opciones: ["Sí","No","Depende","A veces"], correcta: 0 },
+        { texto: "La transparencia implica:", opciones: ["Mostrar información completa","Ocultar costos","Prometer beneficios","Manipular datos"], correcta: 0 },
+        { texto: "El código de ética asegura:", opciones: ["Confianza","Ganancias","Ventas","Publicidad"], correcta: 0 },
+        { texto: "Un conflicto de interés es:", opciones: ["Cuando intereses personales comprometen al cliente","Cuando el cliente elige mal","Cuando no hay información","Cuando todo sale bien"], correcta: 0 },
+        { texto: "Integridad significa actuar con:", opciones: ["Honestidad","Rapidez","Secretismo","Ganancia"], correcta: 0 },
+        { texto: "El asesor debe informar:", opciones: ["Riesgos","Solo beneficios","Nada","Solo ventajas"], correcta: 0 },
+        { texto: "Ética protege:", opciones: ["Confianza del mercado","Ganancias","Publicidad","Ventas"], correcta: 0 },
+        { texto: "Integridad incluye:", opciones: ["Actuar rectamente","Engaña al cliente","Maximizar ventas","Reducir costos"], correcta: 0 },
+        { texto: "Ética e integridad requieren:", opciones: ["Transparencia","Rentabilidad","Publicidad","Captación"], correcta: 0 },
+        { texto: "La ética profesional es:", opciones: ["Obligatoria","Opcional","Deseable","Irrelevante"], correcta: 0 }
+      ],
+      "Análisis Económico": [
+        { texto: "El PIB representa el:", opciones: ["Valor total producido","Índice de precios","Tasa de interés","Tasa de desempleo"], correcta: 0 },
+        { texto: "El IPC mide:", opciones: ["Inflación","Producción","Deuda","Exportaciones"], correcta: 0 },
+        { texto: "Alta inflación reduce:", opciones: ["Poder adquisitivo","Exportaciones","Deuda","Reservas"], correcta: 0 },
+        { texto: "Desempleo indica el % de:", opciones: ["Población activa sin trabajo","Población total","Empleados con contrato","Reservas internacionales"], correcta: 0 },
+        { texto: "El ciclo económico incluye:", opciones: ["Crecimiento y recesión","Solo crecimiento","Solo recesión","Tasas variables"], correcta: 0 },
+        { texto: "PIB per cápita es:", opciones: ["PIB dividido por población","PIB total","Ingresos totales","Inflación"], correcta: 0 },
+        { texto: "Inflación moderada suele:", opciones: ["Estimular consumo","Detenerlo","Aumentar desempleo","Reducir salarios"], correcta: 0 },
+        { texto: "IPC ajusta:", opciones: ["Precios de consumo","Salarios","Exportaciones","Reservas"], correcta: 0 },
+        { texto: "PIB real excluye:", opciones: ["Efecto inflación","Producción","Inversión","Tasa interés"], correcta: 0 },
+        { texto: "Expansión ocurre cuando:", opciones: ["PIB crece","PIB cae","IPC sube","Tasas bajan"], correcta: 0 }
+      ]
+    };
+
+    const container = document.getElementById("quizContainer");
+    Object.keys(banco).forEach(mod => {
+      const div = document.createElement("div");
+      div.className = "modulo";
+      div.innerHTML = `<h2>${mod}</h2>`;
+      shuffle(banco[mod]).slice(0,5).forEach((preg,i) => {
+        const qid = `${mod}_${i}`;
+        const reform = shuffle([preg.texto, preg.texto.replace(/[¿?]/g,"") + "?"])[0];
+        const opts = shuffle(preg.opciones.map((o, idx)=>( { o, idx } )));
+        const qdiv = document.createElement("div");
+        qdiv.className = "pregunta";
+        qdiv.innerHTML = `<p>${reform}</p>`;
+        opts.forEach(opt => {
+          const lbl = document.createElement("label");
+          lbl.innerHTML = `<input type="radio" name="${qid}" value="${opt.idx}">${opt.o}`;
+          qdiv.appendChild(lbl);
+        });
+        div.appendChild(qdiv);
+      });
+      container.appendChild(div);
+    });
+
+    document.getElementById("calcularBtn").addEventListener("click", () => {
+      let total = 0, aciertos = 0;
+      document.querySelectorAll(".modulo").forEach(modDiv => {
+        modDiv.querySelectorAll(".pregunta").forEach(qDiv => {
+          const name = qDiv.querySelector("input")?.name;
+          if (!name) return;
+          const checked = qDiv.querySelector("input:checked");
+          total++;
+          const mod = name.split("_")[0];
+          const texto = qDiv.querySelector("p").textContent.replace("?","");
+          const orig = banco[mod].find(q => q.texto.replace(/[¿?]/g,"") === texto);
+          if (checked && parseInt(checked.value) === orig.correcta) aciertos++;
+        });
+      });
+      const pct = total ? Math.round(aciertos/total*100) : 0;
+      document.getElementById("resultado").textContent = `✅ ${aciertos} de ${total} → ${pct}% correctas`;
+    });
+  </script>
+</body>
+</html>
